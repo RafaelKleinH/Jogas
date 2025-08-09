@@ -6,33 +6,31 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HeaderView: View {
-    @State private var isStarFilled: Bool = false
+    @ObservedObject var viewModel: GamesListViewModel
+    var modelContext: ModelContext
 
     var body: some View {
         HStack {
-            Image(systemName: isStarFilled ? "star.fill" : "star")
-                .foregroundColor(.accentColor)
-                .onTapGesture {
-                    isStarFilled.toggle()
-                }
-            Spacer()
-            Text("Header Title")
-                .font(.headline)
+            // TODO: - Crash
+            
             Spacer()
             Button(action: {
-                // Action here
+                viewModel.deleteSteamGames(context: modelContext)
             }) {
-                Image(systemName: "bell")
+                Image(systemName: "arrow.clockwise")
                     .foregroundColor(.accentColor)
             }
-            .glassEffect()
+            .headerButtonStyle()
+            
+ 
         }
         .padding()
     }
 }
 
 #Preview {
-    HeaderView()
+    HeaderView(viewModel: GamesListViewModel(), modelContext: try! ModelContainer(for: SteamGamePersistent.self).mainContext)
 }

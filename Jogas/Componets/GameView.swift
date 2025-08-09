@@ -55,6 +55,7 @@ struct GameView: View {
                                     }
                                     
                                     Button {
+                                        id = UUID()
                                         loading = true
                                         urlFinal = "capsule_616x353"
                                     } label: {

@@ -15,12 +15,10 @@ class GamesListViewModel: ObservableObject {
 
     @MainActor
     func saveImage(image: Image, context: ModelContext, game: SteamGamePersistent) {
-        //Task(priority: .utility) {
             let img = ImageRenderer(content: image).uiImage?.pngData()
             game.downloadedImg = img
             game.imgDownloaded = true
             try? context.save()
-        //}
     }
     
     @MainActor

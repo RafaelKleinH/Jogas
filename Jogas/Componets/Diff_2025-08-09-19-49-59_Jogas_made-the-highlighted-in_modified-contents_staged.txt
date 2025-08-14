@@ -1,0 +1,17 @@
+diff --git a/Jogas/GamesList/LastPlayedView.swift b/Jogas/GamesList/LastPlayedView.swift
+new file mode 100644
+index 0000000..ef7483a
+--- /dev/null
++++ b/Jogas/GamesList/LastPlayedView.swift
+@@ -0,0 +1,10 @@
++  ScrollView(.horizontal, showsIndicators: false) {
++                            LazyHStack {
++                                ForEach((0...9), id: \.self) {
++                                    GameView(game: games[$0])
++                                        .frame(minHeight: 0, maxHeight: .infinity)
++                                        .padding(.vertical, 16)
++                                        .padding(.horizontal, 4)
++                                }
++                            }
++                        }
+\ No newline at end of file

@@ -6,66 +6,54 @@
 //
 
 import SwiftUI
-import SwiftData
+
+
 
 struct ContentView: View {
     
     @ObservedObject
     private var viewModel: GamesListViewModel = .init()
     
-    @Environment(\.modelContext)
-    private var modelContext
-    
-    @Query(sort: \SteamGamePersistent.rtimeLastPlayed, order: .reverse)
-    var games: [SteamGamePersistent]
-    
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack(alignment: .bottomLeading) {
+            
+            MainBackground()
             
             VStack(alignment: .center) {
+                ScrollView {
+                    HStack {
+                        Text("Recent Activity")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding(.top, 32)
+                            .padding(.horizontal, 8)
+                        Spacer()
+                        
                 
-                if games.isEmpty {
-                    ProgressView()
-                        .onAppear {
-                            viewModel.loadSteamGames(context: modelContext)
-                        }
-                        
-                 
+                    }
                     
-                } else {
-                    ScrollView {
-                        
+                    if !viewModel.recentGames.isEmpty {
+                        LastPlayedView(games: viewModel.recentGames)
+                            .scaledToFill()
+                    } else {
+                        ProgressView()
+                    }
+                    
+                    if !viewModel.games.isEmpty {
                         HStack {
-                            Text("Recentes")
+                            Text(viewModel.filterType.getName())
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
-                                .padding(.top, 64)
+                                .padding(.top, 32)
                                 .padding(.horizontal, 8)
                             Spacer()
-                            
                         }
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack {
-                                ForEach((0...9), id: \.self) {
-                                    GameView(game: games[$0])
-                                        .frame(minHeight: 0, maxHeight: .infinity)
-                                        .padding(.vertical, 16)
-                                        .padding(.horizontal, 4)
-                                }
-                            }
-                            
-                            
-                        }
-                        
-                        ListFilterView()
-                            .padding(.bottom, 16)
                         
                         LazyVGrid(columns: [
                             GridItem(.flexible()),
                             GridItem(.flexible())],
                                   alignment: .center) {
-                            ForEach(games) { game in
+                            ForEach(Array(viewModel.games.enumerated()), id: \.offset) { index, game in
                                 GameView(game: game)
                                     .padding(.bottom, 8)
                             }
@@ -75,16 +63,36 @@ struct ContentView: View {
                 }
             }
             
-            HeaderView(viewModel: viewModel, modelContext: modelContext)
+            if viewModel.searching {
+                SearchView(games: viewModel.searchedGames)
+                    .padding(.top, 32)
+                    .ignoresSafeArea(.container, edges: .bottom)
+            }
+         
+            
+            BottomButtonStack(filterType: $viewModel.filterType, search: $viewModel.searchText, searching: $viewModel.searching)
+                .padding()
+                .ignoresSafeArea()
+           
+        }
+        .onAppear {
+            Task {
+                async let games: Void = viewModel.getGames(filter: viewModel.filterType.rawValue)
+                async let recentGames: Void = viewModel.getRecentGames()
+                await games
+                await recentGames
+            }
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: SteamGamePersistent.self, inMemory: true)
 }
 
 
 //https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=A965E02B18CCD5E11925521BDD82C72B&steamid=76561198374492833&format=json&include_appinfo=true
 
+
+// Ajustar background
+// Criar novas telas

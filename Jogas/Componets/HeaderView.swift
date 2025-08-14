@@ -10,15 +10,27 @@ import SwiftData
 
 struct HeaderView: View {
     @ObservedObject var viewModel: GamesListViewModel
-    var modelContext: ModelContext
+    
+    // UserDefaults property to control animated background
+    @AppStorage("useAnimatedBackground") private var useAnimatedBackground: Bool = true
 
     var body: some View {
         HStack {
             // TODO: - Crash
             
             Spacer()
+            
+            // Animated Background Toggle Button
             Button(action: {
-                viewModel.deleteSteamGames(context: modelContext)
+                useAnimatedBackground.toggle()
+            }) {
+                Image(systemName: useAnimatedBackground ? "sparkles" : "sparkles.rectangle.stack.fill")
+                    .foregroundColor(.accentColor)
+            }
+            .headerButtonStyle()
+            
+            Button(action: {
+                
             }) {
                 Image(systemName: "arrow.clockwise")
                     .foregroundColor(.accentColor)
@@ -32,5 +44,5 @@ struct HeaderView: View {
 }
 
 #Preview {
-    HeaderView(viewModel: GamesListViewModel(), modelContext: try! ModelContainer(for: SteamGamePersistent.self).mainContext)
+    HeaderView(viewModel: GamesListViewModel())
 }

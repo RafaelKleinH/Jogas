@@ -89,10 +89,3 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
-
-
-//https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=A965E02B18CCD5E11925521BDD82C72B&steamid=76561198374492833&format=json&include_appinfo=true
-
-
-// Ajustar background
-// Criar novas telas

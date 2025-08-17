@@ -5,8 +5,6 @@
 //  Created by Rafael Hartmann on 07/01/25.
 //
 
-import Foundation
-import SwiftData
 import SwiftUI
 
 class GamesListViewModel: ObservableObject {
@@ -15,7 +13,7 @@ class GamesListViewModel: ObservableObject {
     @Published var needLoadingAnimation: Bool = false
     @Published var games: [SteamGamesResumed] = []
     @Published var recentGames: [SteamGamesResumed] = []
-    @Published var filterType: FilterTypes = FilterTypes.recent_played {
+    @Published var filterType: FilterTypes = FilterTypes.most_played {
         didSet {
             Task {
                 await getGames(filter: filterType.rawValue)
@@ -45,7 +43,7 @@ class GamesListViewModel: ObservableObject {
             let fetchedGames = try await loadHomeGames(filterType: filter)
             await MainActor.run {
                 self.games = fetchedGames
-                self.searchedGames = games
+                self.searchedGames = games.count > 5 ? [games[0], games[1], games[2], games[3], games[4]] : []
                 self.isLoading = false
             }
         } catch {

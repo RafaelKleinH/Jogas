@@ -12,7 +12,14 @@ struct GameView: View {
     let game: SteamGamesResumed
     @State var id = UUID()
     @State var loading = true
-    @State var urlFinal = "hero_capsule"
+    let cornerRadius: CGFloat
+    
+    init(game: SteamGamesResumed, id: UUID = UUID(), loading: Bool = true, cornerRadius: CGFloat = 8) {
+        self.game = game
+        self.id = id
+        self.loading = loading
+        self.cornerRadius = cornerRadius
+    }
     
     var body: some View {
         Group {
@@ -78,7 +85,7 @@ struct GameView: View {
             
         }
         .aspectRatio(374/448, contentMode: .fit)
-        .cornerRadius(8)
+        .cornerRadius(cornerRadius)
     }
 }
 

@@ -23,10 +23,12 @@ struct PopoverItemView: View {
             }
             filterType = filterId
         } label: {
-            HStack {
+            HStack(alignment: .center) {
                 Image(systemName: imageName)
                 
                 Text(text)
+
+                
             }
             .padding()
         }

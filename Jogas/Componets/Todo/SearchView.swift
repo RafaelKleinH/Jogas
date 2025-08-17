@@ -27,8 +27,10 @@ struct SearchView: View {
                 
                     
                 ForEach(Array(games.enumerated()), id: \.offset) { index, game in
-                    SearchItemView(game: game)
-                        .padding(.bottom, 8)
+                    NavigationLink(destination: GameInfoView(viewModel: GameInfoViewModel(gameId: "\(game.appid)"))) {
+                        SearchItemView(game: game)
+                            .padding(.bottom, 8)
+                    }
                 }
                 
                 Spacer()

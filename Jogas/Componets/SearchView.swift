@@ -9,10 +9,12 @@ import SwiftUI
 
 struct SearchView: View {
     
+    @EnvironmentObject
+    var appCoordinator: AppCoordinator
     let games: [SteamGamesResumed]
     
     public var body: some View {
-
+        
         ScrollView {
             
             VStack(alignment: .center) {
@@ -25,14 +27,13 @@ struct SearchView: View {
                     Spacer()
                 }
                 
-                    
                 ForEach(Array(games.enumerated()), id: \.offset) { index, game in
-                    NavigationLink(destination: GameInfoView(viewModel: GameInfoViewModel(gameId: "\(game.appid)"))) {
-                        SearchItemView(game: game)
-                            .padding(.bottom, 8)
-                    }
+                    SearchItemView(game: game)
+                        .padding(.bottom, 8)
+                        .onTapGesture {
+                            appCoordinator.path.append(GameListDestination.GameInfo(id: "\(game.appid)"))
+                        }
                 }
-                
                 Spacer()
             }
             .padding()

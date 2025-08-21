@@ -25,10 +25,7 @@ struct PopoverItemView: View {
         } label: {
             HStack(alignment: .center) {
                 Image(systemName: imageName)
-                
                 Text(text)
-
-                
             }
             .padding()
         }

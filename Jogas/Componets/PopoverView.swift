@@ -13,7 +13,6 @@ struct PopoverView: View {
     @Binding var filterType: FilterTypes
     
     var body: some View {
-        
         VStack {
             PopoverItemView(isShowingPopover: $isShowingPopover, filterType: $filterType, text: FilterTypes.alphabetical.getName(), imageName: FilterTypes.alphabetical.getImage(), filterId: FilterTypes.alphabetical)
             PopoverItemView(isShowingPopover: $isShowingPopover, filterType: $filterType, text: FilterTypes.most_played.getName(), imageName: FilterTypes.most_played.getImage(), filterId: FilterTypes.most_played)

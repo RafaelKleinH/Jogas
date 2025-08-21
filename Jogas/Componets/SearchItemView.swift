@@ -22,7 +22,6 @@ struct SearchItemView: View {
                 
                 Spacer()
             }
-        
     }
 }
 

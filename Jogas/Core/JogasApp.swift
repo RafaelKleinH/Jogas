@@ -10,9 +10,16 @@ import SwiftData
 
 @main
 struct JogasApp: App {
+    
+    @StateObject private var appCoordinator = AppCoordinator(path: NavigationPath())
+    @StateObject private var gamesListViewModel = GamesListViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack(path: $appCoordinator.path) {
+                ContentView(viewModel: gamesListViewModel)
+            }
+            .environmentObject(appCoordinator)
         }
     }
 }

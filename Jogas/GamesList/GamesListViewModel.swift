@@ -9,7 +9,10 @@ import SwiftUI
 
 class GamesListViewModel: ObservableObject {
     @Published var searching: Bool = false
-    @Published var isLoading: Bool = false
+   
+    @Published var getGamesStatus: APIStatus = .idle
+    @Published var getRecentGamesStatus: APIStatus = .idle
+    
     @Published var needLoadingAnimation: Bool = false
     @Published var games: [SteamGamesResumed] = []
     @Published var recentGames: [SteamGamesResumed] = []
@@ -21,6 +24,8 @@ class GamesListViewModel: ObservableObject {
         }
     }
     
+    @Published var gridStyle: GridSize = .defaultSize
+    
     @Published var searchedGames: [SteamGamesResumed] = []
     @Published var searchText: String = "" {
         didSet {
@@ -31,12 +36,25 @@ class GamesListViewModel: ObservableObject {
             }
         }
     }
+    
+    private var hasLoadedInitialData = false
+    
+    func loadInitialDataIfNeeded(scrollRefresh: Bool) async {
+        guard !hasLoadedInitialData || scrollRefresh else { return }
+        hasLoadedInitialData = true
+        
+        print("TEST1")
+        async let games: Void = getGames(filter: filterType.rawValue)
+        async let recentGames: Void = getRecentGames()
+        await games
+        await recentGames
+    }
 
     
-    func getGames(filter: String) async {
+    private func getGames(filter: String) async {
         await MainActor.run {
             games = []
-            self.isLoading = true
+            getGamesStatus = .loading
         }
         
         do {
@@ -44,33 +62,33 @@ class GamesListViewModel: ObservableObject {
             await MainActor.run {
                 self.games = fetchedGames
                 self.searchedGames = games.count > 5 ? [games[0], games[1], games[2], games[3], games[4]] : []
-                self.isLoading = false
+                self.getGamesStatus = .success
             }
         } catch {
             print(error)
             await MainActor.run {
-                self.isLoading = false
+                self.getGamesStatus = .failure
                 self.games = []
             }
         }
     }
     
     
-    func getRecentGames() async {
+    private func getRecentGames() async {
         await MainActor.run {
-            self.isLoading = true
+            self.getRecentGamesStatus = .loading
         }
         
         do {
             let fetchedGames = try await loadRecentGames()
             await MainActor.run {
                 self.recentGames = fetchedGames
-                self.isLoading = false
+                self.getRecentGamesStatus = .success
             }
         } catch {
             print(error)
             await MainActor.run {
-                self.isLoading = false
+                self.getRecentGamesStatus = .failure
                 self.recentGames = []
             }
         }

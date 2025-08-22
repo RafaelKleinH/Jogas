@@ -62,6 +62,23 @@ struct GameInfoView: View {
             case .success:
                 if let game = viewModel.gameInfo {
                     gameContentView(for: game)
+                        .sheet(isPresented: $viewModel.isPresenting, content: {
+                            RatingView(
+                                firstSliderValue: $viewModel.firstSliderValue,
+                                lastSliderValue: $viewModel.lastSliderValue,
+                                firstDragValue: $viewModel.firstDragValue,
+                                lastDragValue: $viewModel.lastDragValue,
+                                isPresenting: $viewModel.isPresenting,
+                                action: {
+                                    Task {
+                                        await viewModel.postRating()
+                                    }
+                                }
+                            )
+                            .presentationDetents([.height(340)])
+                            .presentationDragIndicator(.visible)
+                            .presentationCornerRadius(24)
+                        })
                 }
             case .failure:
                 failureView
@@ -71,6 +88,14 @@ struct GameInfoView: View {
         }
         .ignoresSafeArea(.container, edges: .top)
         .defaultScrollAnchor(viewModel.gameDetailStatus == .success ? .top : .center, for: .alignment)
+        .navigationDestination(for: GameInfoDestination.self) { value in
+            switch value {
+            case .GameRating:
+                EmptyView()
+            case .GameSpoiler(let text):
+                GameSpoilerView(viewModel: .init(spoilerText: text, gameId: viewModel.gameId))
+            }
+        }
         .task {
             if viewModel.gameDetailStatus == .idle {
                 await viewModel.getGameDetail(gameId: viewModel.gameId)
@@ -100,14 +125,6 @@ struct GameInfoView: View {
             
             // Story Summary Section
             storySummarySection()
-                .navigationDestination(for: GameInfoDestination.self) { value in
-                    switch value {
-                    case .GameRating:
-                        EmptyView()
-                    case .GameSpoiler(let text):
-                        GameSpoilerView(viewModel: .init(spoilerText: text, gameId: viewModel.gameId))
-                    }
-                }
             
         }
         
@@ -178,6 +195,7 @@ struct GameInfoView: View {
             
             if let rating = game.userRating {
                 ratingDisplayView(rating: rating, isPersonal: true)
+                    .padding(.top)
             }
             
             rateGameButton(hasExistingRating: game.userRating != nil)
@@ -218,7 +236,7 @@ struct GameInfoView: View {
     
     private func rateGameButton(hasExistingRating: Bool) -> some View {
         Button {
-            // TODO: Implement rating functionality
+            viewModel.isPresenting = true
         } label: {
             HStack(alignment: .center) {
                 Spacer()
@@ -285,7 +303,7 @@ struct GameInfoView: View {
     
     private func playTimePlatformView(title: String, time: Int, systemImage: String? = nil, isSystemName: Bool = true) -> some View {
         HStack(alignment: .center) {
-         
+            
             if let systemImage = systemImage, isSystemName {
                 Image(systemName: systemImage)
                     .resizable()

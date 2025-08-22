@@ -22,7 +22,7 @@ struct SteamGame: Codable, Equatable {
     var description: String?
     let storyResume: String?
     var averageRating: Decimal?
-    let userRating: Decimal?
+    var userRating: Decimal?
 }
 
 struct SteamGameDescription: Codable, Equatable {
@@ -33,6 +33,9 @@ struct SteamGameSpoiler: Codable, Equatable {
     var storyResume: String
 }
 
+struct SteamGameUserRate: Codable, Equatable {
+    let userRating: Decimal
+}
 
 struct SteamGamesResumed: Codable, Equatable {
     let appid: Int

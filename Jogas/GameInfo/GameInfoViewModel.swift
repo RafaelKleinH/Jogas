@@ -23,6 +23,13 @@ class GameInfoViewModel: ObservableObject {
     @Published var ratingStatus: APIStatus = .idle
     @Published var ratingLoading = false
     
+    @Published public var firstSliderValue: Int = 0
+    @Published public var lastSliderValue: Int = 0
+    @Published public var firstDragValue: Int = 0
+    @Published public var lastDragValue: Int = 0
+    
+    @Published var isPresenting: Bool = false
+    
     let gameId: String
     
     public init(gameId: String) {
@@ -44,6 +51,11 @@ class GameInfoViewModel: ObservableObject {
     @MainActor
     func updateGameAverageRating(rating: Decimal) {
         self.gameInfo?.averageRating = rating
+    }
+    
+    @MainActor
+    func updateGameUserRating(rating: Decimal) {
+        self.gameInfo?.userRating = rating
     }
     
     @MainActor
@@ -83,7 +95,7 @@ class GameInfoViewModel: ObservableObject {
         } catch {
             await gameDetailStatus(status: .failure)
         }
-
+        
     }
     
     func getGameDescription(gameId: String) async {
@@ -108,6 +120,20 @@ class GameInfoViewModel: ObservableObject {
             await ratingStatus(status: .success)
         } catch {
             await ratingStatus(status: .failure)
+        }
+    }
+    
+    func postRating() async {
+        
+        guard let rating = Decimal(string: "\(firstSliderValue).\(lastSliderValue)") else { return }
+        await updateGameUserRating(rating: rating)
+        
+        do {
+            print("12")
+            try await postRating(gameRating: rating, gameId: gameId)
+        } catch {
+            print(String(describing: error))
+            return
         }
     }
     
@@ -146,6 +172,17 @@ class GameInfoViewModel: ObservableObject {
         let (data, _) = try await URLSession.shared.data(for: request)
         let fetchedData = try JSONDecoder().decode(Decimal.self, from: data)
         return fetchedData
+    }
+    
+    private func postRating(gameRating: Decimal, gameId: String) async throws -> Void {
+        let url = URL(string: NetworkCore.baseURL + "/api/games/\(gameId)/user-rating")
+        var request = URLRequest(url: url!)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        print(gameRating)
+        request.httpBody = try JSONEncoder().encode(SteamGameUserRate(userRating: gameRating))
+        let (_, _) = try await URLSession.shared.data(for: request)
+        return ()
     }
 }
 

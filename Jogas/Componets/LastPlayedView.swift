@@ -13,15 +13,20 @@ struct LastPlayedView: View {
     let games: [SteamGamesResumed]
     @State private var highlightedIndex: Int = 0
     
-    private let peekAmount: CGFloat = 40 // How much of the adjacent games show
-    private let spacing: CGFloat = 16
+    init(games: [SteamGamesResumed]) {
+        self.games = games
+    }
+    
+    private var peekAmount: CGFloat = UIDevice().userInterfaceIdiom == .pad ? 64 : 40 // How much of the adjacent games show
+    
+    private let spacing: CGFloat = 0
     
     var body: some View {
         ScrollView {
             GeometryReader { geometry in
                 let gameCount = min(games.count, 10)
                 let highlightedWidth = geometry.size.width - (peekAmount * 2)
-                let nonHighlightedWidth = highlightedWidth * 0.8
+                let nonHighlightedWidth = highlightedWidth * 0.9
                 
                 // Calculate offset to center the highlighted card
                 let centerOffset = calculateCenterOffset(
@@ -93,3 +98,6 @@ struct LastPlayedView: View {
     }
 }
 
+#Preview {
+    ContentView()
+}

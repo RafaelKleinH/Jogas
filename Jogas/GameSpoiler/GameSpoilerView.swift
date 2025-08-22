@@ -20,10 +20,8 @@ struct GameSpoilerView: View {
             .appleIntelligenceEffect(isActive: $viewModel.spoilerLoading, cornerRadius: 46)
             .padding(2)
             .ignoresSafeArea(.container, edges: .vertical)
-        
-        
-      
-                getMainView()
+            
+            getMainView()
  
         }
         .task {
